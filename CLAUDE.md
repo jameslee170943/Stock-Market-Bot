@@ -22,15 +22,18 @@
 - [x] 2단계: 뉴스 소스 결정 (국내 뉴스 위주, 네이버 뉴스 검색 API 사용) + API 키 발급 + `.env` 설정 완료
 - [x] 3단계: 네이버 뉴스 API 연결 테스트 코드 작성 및 성공 확인 (`news_collector/test_connection.py`)
 - [x] 4단계: 키워드(AI/블록체인/제조업)별 뉴스 수집 후 `data/news_날짜.json`에 저장하는 코드 작성 (`news_collector/collect_news.py`)
-- [x] 5단계: AI 요약 코드 작성 (`summarizer/summarize_news.py`, Claude API 사용) — 코드는 완성했으나 Claude API 크레딧 부족으로 실제 테스트는 아직 못함 (크레딧 충전 후 테스트 필요)
+- [x] 5단계: AI 요약 코드 작성 (`summarizer/summarize_news.py`, Claude API 사용)
 - [x] 6단계: 이메일 발송 코드 작성 및 테스트 성공 (`notifier/send_email.py`, Gmail 앱 비밀번호 사용, 발신/수신 모두 jameslee170943@gmail.com)
-- [x] 7단계: 전체 파이프라인 연결 (`main.py` — 뉴스 수집 → AI 요약 → 이메일 발송 순서로 실행, 중간 단계 실패 시 다음 단계로 안 넘어가도록 처리) 작성 및 동작 확인 (AI 요약 단계에서 예상대로 멈추는 것까지 확인)
-- [ ] 8단계: (다음 단계 진행 시 여기에 기록 — Claude API 크레딧 충전 후 전체 파이프라인 테스트, 이후 매일 자동 실행되도록 예약(cron) 설정 예정)
+- [x] 7단계: 전체 파이프라인 연결 (`main.py` — 뉴스 수집 → AI 요약 → 이메일 발송 순서로 실행)
+- [x] 8단계: Claude API 크레딧($5) 충전 후 전체 파이프라인 실행 테스트 성공 — 29건 수집 → AI가 중요 뉴스만 섹터별로 요약(제외 사유까지 설명) → 이메일 정상 발송 확인
+- [x] 9단계: 깃허브 저장소(jameslee170943/-)에 초기 커밋 및 푸시 완료 (.env, data/는 .gitignore로 제외)
+- [x] 10단계: 매일 오전 8시 자동 실행 설정 완료 (macOS launchd 사용, `scheduler/com.stockbriefingbot.daily.plist` → `~/Library/LaunchAgents/`에 등록, `launchctl bootstrap`으로 활성화). 실행 로그는 `logs/stdout.log`, `logs/stderr.log`에 기록됨
+- [ ] 11단계: (다음 단계 진행 시 여기에 기록)
 
 ## 기술 스택 (진행하며 채워나감)
 - 언어: Python 3.9.6
 - 뉴스 수집: 네이버 뉴스 검색 API (국내 뉴스 위주)
-- AI 요약: Claude API (claude-opus-4-8) — 크레딧 충전 대기 중
+- AI 요약: Claude API (claude-opus-4-8)
 - 알림 발송: 이메일 (Gmail SMTP, 앱 비밀번호 사용)
 
 ## 설치된 패키지
