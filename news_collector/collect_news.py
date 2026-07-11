@@ -13,9 +13,14 @@ load_dotenv()
 
 CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
 CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
+NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")
 
-# 관심 있는 분야 키워드 목록입니다. 나중에 필요하면 여기에 단어를 추가/삭제하면 돼요.
-KEYWORDS = ["AI", "블록체인", "제조업"]
+# 관심 있는 분야별로, 국내(네이버) 검색어와 미국(NewsAPI) 검색어를 짝지어둔 목록입니다.
+SECTORS = [
+    {"keyword": "AI", "us_query": "artificial intelligence"},
+    {"keyword": "블록체인", "us_query": "blockchain"},
+    {"keyword": "제조업", "us_query": "semiconductor manufacturing"},
+]
 
 
 def clean_html(text):
@@ -51,6 +56,7 @@ def fetch_news(keyword, display=10):
         cleaned_items.append(
             {
                 "keyword": keyword,
+                "source": "국내",
                 "title": clean_html(item["title"]),
                 "description": clean_html(item["description"]),
                 "link": item["link"],
@@ -60,14 +66,52 @@ def fetch_news(keyword, display=10):
     return cleaned_items
 
 
+def fetch_us_news(keyword, us_query, page_size=10):
+    """NewsAPI.org에 영어 검색어로 요청해서, 미국 뉴스를 가져와 정리해서 돌려줍니다."""
+    url = "https://newsapi.org/v2/everything"
+    params = {
+        "q": us_query,
+        "language": "en",
+        "sortBy": "publishedAt",
+        "pageSize": page_size,
+        "apiKey": NEWSAPI_KEY,
+    }
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+
+    articles = response.json()["articles"]
+
+    cleaned_items = []
+    for article in articles:
+        cleaned_items.append(
+            {
+                "keyword": keyword,
+                "source": "해외",
+                "title": article["title"],
+                "description": article["description"] or "",
+                "link": article["url"],
+                "pubDate": article["publishedAt"],
+            }
+        )
+    return cleaned_items
+
+
 def main():
     all_news = []
 
-    for keyword in KEYWORDS:
-        print(f"'{keyword}' 뉴스 수집 중...")
+    for sector in SECTORS:
+        keyword = sector["keyword"]
+
+        print(f"'{keyword}' 국내 뉴스 수집 중...")
         news_items = fetch_news(keyword)
         all_news.extend(news_items)
         print(f"  -> {len(news_items)}건 수집 완료")
+
+        print(f"'{keyword}' 미국 뉴스 수집 중...")
+        us_news_items = fetch_us_news(keyword, sector["us_query"])
+        all_news.extend(us_news_items)
+        print(f"  -> {len(us_news_items)}건 수집 완료")
 
     today_str = date.today().isoformat()
     save_path = f"data/news_{today_str}.json"

@@ -28,11 +28,13 @@
 - [x] 8단계: Claude API 크레딧($5) 충전 후 전체 파이프라인 실행 테스트 성공 — 29건 수집 → AI가 중요 뉴스만 섹터별로 요약(제외 사유까지 설명) → 이메일 정상 발송 확인
 - [x] 9단계: 깃허브 저장소(jameslee170943/-)에 초기 커밋 및 푸시 완료 (.env, data/는 .gitignore로 제외)
 - [x] 10단계: 매일 오전 8시 자동 실행 설정 완료 (macOS launchd 사용, `scheduler/com.stockbriefingbot.daily.plist` → `~/Library/LaunchAgents/`에 등록, `launchctl bootstrap`으로 활성화). 실행 로그는 `logs/stdout.log`, `logs/stderr.log`에 기록됨
-- [ ] 11단계: (다음 단계 진행 시 여기에 기록)
+- [x] 11단계: AI 요약 프롬프트를 매크로/섹터/개별종목 우선순위 기반 분석 형식으로 교체 (`summarizer/summarize_news.py`)
+- [x] 12단계: NewsAPI.org 연동해 미국 시장 뉴스 수집 추가 (`news_collector/collect_news.py` — 섹터별로 국내(네이버)/미국(NewsAPI) 뉴스를 함께 수집, 각 뉴스에 `source`(국내/해외) 필드 추가)
+- [ ] 13단계: (다음 단계 진행 시 여기에 기록)
 
 ## 기술 스택 (진행하며 채워나감)
 - 언어: Python 3.9.6
-- 뉴스 수집: 네이버 뉴스 검색 API (국내 뉴스 위주)
+- 뉴스 수집: 네이버 뉴스 검색 API (국내) + NewsAPI.org (미국, 영어 키워드 검색)
 - AI 요약: Claude API (claude-opus-4-8)
 - 알림 발송: 이메일 (Gmail SMTP, 앱 비밀번호 사용)
 
