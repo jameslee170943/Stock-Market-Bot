@@ -30,7 +30,8 @@
 - [x] 10단계: 매일 오전 8시 자동 실행 설정 완료 (macOS launchd 사용, `scheduler/com.stockbriefingbot.daily.plist` → `~/Library/LaunchAgents/`에 등록, `launchctl bootstrap`으로 활성화). 실행 로그는 `logs/stdout.log`, `logs/stderr.log`에 기록됨
 - [x] 11단계: AI 요약 프롬프트를 매크로/섹터/개별종목 우선순위 기반 분석 형식으로 교체 (`summarizer/summarize_news.py`)
 - [x] 12단계: NewsAPI.org 연동해 미국 시장 뉴스 수집 추가 (`news_collector/collect_news.py` — 섹터별로 국내(네이버)/미국(NewsAPI) 뉴스를 함께 수집, 각 뉴스에 `source`(국내/해외) 필드 추가)
-- [ ] 13단계: (다음 단계 진행 시 여기에 기록)
+- [x] 13단계: 자동 실행 주기를 매일 → 월/수/금 오전 8시로 변경 (`scheduler/com.stockbriefingbot.daily.plist`의 `StartCalendarInterval`을 요일별 3개 항목으로 수정 후 launchd 재등록). 참고: 7/18~7/21 사이 Claude API 키가 무효화(401 오류)되어 요약/발송이 안 되고 있었음 — 사용자가 직접 콘솔에서 조치 예정
+- [ ] 14단계: (다음 단계 진행 시 여기에 기록)
 
 ## 기술 스택 (진행하며 채워나감)
 - 언어: Python 3.9.6
