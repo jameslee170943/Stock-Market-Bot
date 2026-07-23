@@ -31,7 +31,8 @@
 - [x] 11단계: AI 요약 프롬프트를 매크로/섹터/개별종목 우선순위 기반 분석 형식으로 교체 (`summarizer/summarize_news.py`)
 - [x] 12단계: NewsAPI.org 연동해 미국 시장 뉴스 수집 추가 (`news_collector/collect_news.py` — 섹터별로 국내(네이버)/미국(NewsAPI) 뉴스를 함께 수집, 각 뉴스에 `source`(국내/해외) 필드 추가)
 - [x] 13단계: 자동 실행 주기를 매일 → 월/수/금 오전 8시로 변경 (`scheduler/com.stockbriefingbot.daily.plist`의 `StartCalendarInterval`을 요일별 3개 항목으로 수정 후 launchd 재등록). 참고: 7/18~7/21 사이 Claude API 키가 무효화(401 오류)되어 요약/발송이 안 되고 있었음 — 사용자가 직접 콘솔에서 조치 예정
-- [ ] 14단계: (다음 단계 진행 시 여기에 기록)
+- [x] 14단계: 기준금리(국내 한국은행 + 미국 연준) 뉴스 수집 추가 (`news_collector/collect_news.py`의 `SECTORS`에 항목 추가), AI 요약 프롬프트에서 '매크로' 뉴스는 주식시장/AI 섹터/로봇 섹터 영향으로 세분화 분석하도록 개선 (`summarizer/summarize_news.py`). 분석 분량이 늘어나 `max_tokens`를 2000 → 4000으로 상향 조정
+- [ ] 15단계: (다음 단계 진행 시 여기에 기록)
 
 ## 기술 스택 (진행하며 채워나감)
 - 언어: Python 3.9.6
