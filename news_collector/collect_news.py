@@ -5,6 +5,7 @@ data/ 폴더에 오늘 날짜 파일로 저장하는 코드입니다.
 
 import os
 import json
+import time
 from datetime import date
 from dotenv import load_dotenv
 import requests
@@ -34,6 +35,21 @@ def clean_html(text):
     )
 
 
+def request_with_retry(url, headers=None, params=None, retries=3, delay=5):
+    """네트워크 요청이 실패하면, 잠시 기다렸다가 최대 retries번까지 다시 시도합니다."""
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            return response
+        except requests.exceptions.RequestException as e:
+            if attempt == retries:
+                raise
+            print(f"  ⚠️ 요청 실패 (시도 {attempt}/{retries}): {e}")
+            print(f"  {delay}초 후 다시 시도할게요...")
+            time.sleep(delay)
+
+
 def fetch_news(keyword, display=10):
     """네이버 뉴스 검색 API에 특정 키워드로 뉴스를 요청하고, 결과를 정리해서 돌려줍니다."""
     url = "https://openapi.naver.com/v1/search/news.json"
@@ -47,8 +63,7 @@ def fetch_news(keyword, display=10):
         "sort": "date",       # 최신순 정렬
     }
 
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()  # 요청이 실패하면 여기서 에러를 발생시켜 바로 알 수 있게 합니다.
+    response = request_with_retry(url, headers=headers, params=params)
 
     items = response.json()["items"]
 
@@ -78,8 +93,7 @@ def fetch_us_news(keyword, us_query, page_size=10):
         "apiKey": NEWSAPI_KEY,
     }
 
-    response = requests.get(url, params=params)
-    response.raise_for_status()
+    response = request_with_retry(url, params=params)
 
     articles = response.json()["articles"]
 
