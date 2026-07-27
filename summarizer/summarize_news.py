@@ -62,7 +62,7 @@ system_prompt = (
 
 response = client.messages.create(
     model="claude-opus-4-8",
-    max_tokens=4000,
+    max_tokens=8000,
     system=system_prompt,
     messages=[{"role": "user", "content": news_text}],
 )
