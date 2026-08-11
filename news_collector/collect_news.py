@@ -21,11 +21,12 @@ NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")
 DAYS_RANGE = 3
 
 # 관심 있는 분야별로, 국내(네이버) 검색어와 미국(NewsAPI) 검색어를 짝지어둔 목록입니다.
+# keyword: AI에게 보여줄 분류 이름 / kr_query: 네이버에 실제로 보낼 검색어(없으면 keyword를 그대로 씀)
 SECTORS = [
     {"keyword": "AI", "us_query": "artificial intelligence"},
     {"keyword": "블록체인", "us_query": "blockchain"},
     {"keyword": "제조업", "us_query": "semiconductor manufacturing"},
-    {"keyword": "기준금리", "us_query": "Federal Reserve interest rate"},
+    {"keyword": "기준금리", "kr_query": "\"기준금리\"", "us_query": "Federal Reserve interest rate"},
     {"keyword": "실적 발표", "us_query": "big tech earnings report"},
 ]
 
@@ -55,15 +56,16 @@ def request_with_retry(url, headers=None, params=None, retries=3, delay=5):
             time.sleep(delay)
 
 
-def fetch_news(keyword, display=10):
-    """네이버 뉴스 검색 API에 특정 키워드로 뉴스를 요청하고, 결과를 정리해서 돌려줍니다."""
+def fetch_news(keyword, query=None, display=10):
+    """네이버 뉴스 검색 API에 특정 검색어로 뉴스를 요청하고, 결과를 정리해서 돌려줍니다."""
+    query = query or keyword  # 별도 검색어가 없으면 분류 이름을 그대로 검색어로 씁니다.
     url = "https://openapi.naver.com/v1/search/news.json"
     headers = {
         "X-Naver-Client-Id": CLIENT_ID,
         "X-Naver-Client-Secret": CLIENT_SECRET,
     }
     params = {
-        "query": keyword,
+        "query": query,
         "display": display,  # 키워드당 몇 개의 뉴스를 가져올지
         "sort": "date",       # 최신순 정렬
     }
@@ -133,7 +135,7 @@ def main():
         keyword = sector["keyword"]
 
         print(f"'{keyword}' 국내 뉴스 수집 중...")
-        news_items = fetch_news(keyword)
+        news_items = fetch_news(keyword, sector.get("kr_query"))
         all_news.extend(news_items)
         print(f"  -> {len(news_items)}건 수집 완료")
 
