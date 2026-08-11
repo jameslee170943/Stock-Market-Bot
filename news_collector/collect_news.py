@@ -6,7 +6,8 @@ data/ 폴더에 오늘 날짜 파일로 저장하는 코드입니다.
 import os
 import json
 import time
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from dotenv import load_dotenv
 import requests
 
@@ -15,6 +16,9 @@ load_dotenv()
 CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
 CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")
+
+# 최근 며칠 이내의 뉴스만 수집할지 정하는 값입니다.
+DAYS_RANGE = 3
 
 # 관심 있는 분야별로, 국내(네이버) 검색어와 미국(NewsAPI) 검색어를 짝지어둔 목록입니다.
 SECTORS = [
@@ -68,8 +72,15 @@ def fetch_news(keyword, display=10):
 
     items = response.json()["items"]
 
+    # 네이버 API는 기간 필터를 지원하지 않아서, 받아온 뒤 발행일을 직접 확인해 걸러냅니다.
+    cutoff = datetime.now(timezone.utc) - timedelta(days=DAYS_RANGE)
+
     cleaned_items = []
     for item in items:
+        pub_date = parsedate_to_datetime(item["pubDate"])
+        if pub_date < cutoff:
+            continue
+
         cleaned_items.append(
             {
                 "keyword": keyword,
@@ -86,11 +97,13 @@ def fetch_news(keyword, display=10):
 def fetch_us_news(keyword, us_query, page_size=10):
     """NewsAPI.org에 영어 검색어로 요청해서, 미국 뉴스를 가져와 정리해서 돌려줍니다."""
     url = "https://newsapi.org/v2/everything"
+    from_date = (date.today() - timedelta(days=DAYS_RANGE)).isoformat()
     params = {
         "q": us_query,
         "language": "en",
         "sortBy": "publishedAt",
         "pageSize": page_size,
+        "from": from_date,  # 이 날짜 이후에 발행된 기사만 요청합니다.
         "apiKey": NEWSAPI_KEY,
     }
 
