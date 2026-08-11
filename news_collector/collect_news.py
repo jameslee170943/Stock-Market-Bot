@@ -22,6 +22,7 @@ SECTORS = [
     {"keyword": "블록체인", "us_query": "blockchain"},
     {"keyword": "제조업", "us_query": "semiconductor manufacturing"},
     {"keyword": "기준금리", "us_query": "Federal Reserve interest rate"},
+    {"keyword": "실적 발표", "us_query": "big tech earnings report"},
 ]
 
 
