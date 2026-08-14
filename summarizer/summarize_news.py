@@ -5,6 +5,7 @@ AI/블록체인/제조업 투자 관점에서 중요한 뉴스만 골라 요약�
 
 import os
 import json
+import time
 from datetime import date
 from dotenv import load_dotenv
 import anthropic
@@ -81,12 +82,25 @@ system_prompt = (
     "- 주가나 산업 동향에 실질적인 영향을 준다고 보기 어려운 뉴스"
 )
 
-response = client.messages.create(
-    model="claude-opus-4-8",
-    max_tokens=8000,
-    system=system_prompt,
-    messages=[{"role": "user", "content": news_text}],
-)
+def create_summary_with_retry(retries=3, delay=5):
+    """Claude API 요청이 네트워크 문제로 실패하면, 잠시 기다렸다가 최대 retries번까지 다시 시도합니다."""
+    for attempt in range(1, retries + 1):
+        try:
+            return client.messages.create(
+                model="claude-opus-4-8",
+                max_tokens=8000,
+                system=system_prompt,
+                messages=[{"role": "user", "content": news_text}],
+            )
+        except anthropic.APIConnectionError as e:
+            if attempt == retries:
+                raise
+            print(f"  ⚠️ 요청 실패 (시도 {attempt}/{retries}): {e}")
+            print(f"  {delay}초 후 다시 시도할게요...")
+            time.sleep(delay)
+
+
+response = create_summary_with_retry()
 
 summary_text = next(block.text for block in response.content if block.type == "text")
 
